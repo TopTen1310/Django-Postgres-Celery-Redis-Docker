@@ -14,17 +14,17 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='client',
+            model_name='Client',
             name='admin_poc',
             field=models.ForeignKey(limit_choices_to={'is_staff': True}, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
-            model_name='client',
+            model_name='Client',
             name='id',
             field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
         ),
         migrations.AlterField(
-            model_name='license',
+            model_name='License',
             name='id',
             field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
         ),

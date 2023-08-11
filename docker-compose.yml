@@ -1,15 +1,95 @@
+version: '3.8'
+
+# Database and cache services
 services:
-  license-server:
-    build:
-      context: ./license_portal
-    links:
-      - postgres
-    volumes:
-      - ./license_portal:/app
 
   postgres:
     image: 'postgres:13'
     environment:
-     POSTGRES_USER: 'licenses'
-     POSTGRES_PASSWORD: 'licenses'
-     POSTGRES_DB: 'licenses'
+      POSTGRES_USER: 'licenses'
+      POSTGRES_PASSWORD: 'licenses'
+      POSTGRES_DB: 'licenses'
+    restart: always
+    networks:
+      - backend
+
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - 6379:6379
+    restart: always
+    networks:
+      - backend
+
+# Application services
+  migration:
+    build:
+      context: ./license_portal
+    command: ["./wait-for-it.sh", "postgres:5432", "--", "./wait-for-it.sh", "redis:6379", "--", "python", "manage.py", "migrate", "--noinput"]
+    volumes:
+      - ./license_portal:/app
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+
+  license-server:
+    container_name: license-server
+    build:
+      context: ./license_portal
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./license_portal:/app
+    ports:
+      - 8000:8000
+    restart: on-failure
+    depends_on:
+      - migration
+    networks:
+      - backend
+
+  license-test-frontend:
+    environment:
+      REACT_APP_API_URL: 'http://license-server:8000'
+    container_name: license-test-frontend
+    command: http-server build
+    build:
+      context: ./license_test_frontend
+    ports:
+      - 8080:8080
+    depends_on:
+      - license-server
+    networks:
+      - frontend
+      - backend
+
+# Background task services
+  celery:
+    build: 
+      context: ./license_portal
+    command: ["./wait-for-it.sh", "license-server:8000", "--", "celery", "-A", "config.celery", "worker", "-l", "INFO"]
+    volumes:
+      - ./license_portal:/app
+    restart: on-failure
+    depends_on:
+      - license-server
+    networks:
+      - backend
+
+  celery_beat:
+    build: 
+      context: ./license_portal
+    command: ["./wait-for-it.sh", "license-server:8000", "--", "celery", "-A", "config.celery", "beat", "-l", "INFO"]
+    volumes:
+      - ./license_portal:/app
+    restart: on-failure
+    depends_on:
+      - license-server
+    networks:
+      - backend
+
+# Define networks
+networks:
+  frontend:
+  backend:

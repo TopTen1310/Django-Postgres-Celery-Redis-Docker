@@ -31,8 +31,8 @@ class Migration(migrations.Migration):
             name='License',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('package', models.PositiveSmallIntegerField(choices=[('javascript_sdk', 0), ('ios_sdk', 1), ('android_sdk', 2)])),
-                ('license_type', models.PositiveSmallIntegerField(choices=[('production', 0), ('evaluation', 1)])),
+                ('package', models.PositiveSmallIntegerField(choices=[(0, 'javascript_sdk'), (1, 'ios_sdk'), (2, 'android_sdk')])),
+                ('license_type', models.PositiveSmallIntegerField(choices=[(0, 'production'), (1, 'evaluation')])),
                 ('created_datetime', models.DateTimeField(auto_now=True)),
                 ('expiration_datetime', models.DateTimeField(default=licenses.models.get_default_license_expiration)),
                 ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='licenses.Client')),

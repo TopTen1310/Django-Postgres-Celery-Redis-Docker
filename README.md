@@ -1,31 +1,77 @@
-Django Coding Challenge
-=======================
+# Instructions
 
-Hi, this is the castLabs Django coding challenge. This challenge is designed to test your Django and Python skills.
+This is the castLabs Django coding challenge. This challenge is designed to test your Django and Python skills.
 
-Requirements
-============
+```mermaid
+stateDiagram
+    state Job {
+        (*) --> Checking: Checking licenses expiry
+        Checking --> EmailSending: Conditions met
+        EmailSending --> Done: Email sent
+    }
+```
+
+# Quick Start
+
+### Run the services
+
+Use the following command to start all services:
+
+```
+docker compose up
+```
+
+Once the services are up:<br />
+Django backend will be accessible at:`http://localhost:8000`.<br />
+Frontend application can be accessed at: `http://localhost:8080`
+
+### Access Admin Portal:
+
+Navigate to the admin portal at `http://localhost:8000/admin`
+
+Use the following credentials:
+
+- <b>Username</b>: admin
+- <b>Password</b>: admin
+
+# API Endpoints
+
+### Retrieve All Notifications
+
+- Method: `GET`
+- Endpoint: `/api/license/`
+- Description: Fetch all notifications that have been sent so far.
+
+### Trigger Notification Job
+
+- Method: `POST`
+- Endpoint: `/api/license/`
+- Description: This will trigger the notification job and also retrieve all notifications sent to date.
+
+# Automated Notification Job
+
+A scheduled job runs daily at 00:00 to check for expiring licenses. If a client's license meets the set criteria for expiration, a notification email will be automatically sent to the Admin Point of Contact (POC) for that client.
+
+# Requirements
 
 - Completed using Python v3.10 and all code must be annotated with type hints from the standard library `typing` module.
 - Runs on docker and the application can be started with a single command `docker-compose up`
-- The running application can be reached in the browser at *[docker host]:8080*
-- The application is delivered with a sufficient admin reachable at *[docker host]:8080/admin*
+- The running application can be reached in the browser at _[docker host]:8080_
+- The application is delivered with a sufficient admin reachable at _[docker host]:8080/admin_
 - Delivered as a public fork of this GitHub repository
 
-Scenario
-========
+# Scenario
 
 You are implementing part of an SDK licensing application used to permit clients to download the company's proprietary software. The sales team needs a feature which automatically notifies them when one of their client's licenses will expire (and thus prevent the client from using the associated package).
 
-Task
-====
+# Task
 
-A bare bones Django project is provided in the *license_portal* directory. Within the `licenses` application implement an email sending mechanism to notify the admin point of contact `licenses.Client.admin_poc` of their clients license `licenses.License` expiration times. The message must be sent to a clients admin point of contact only if the following conditions are met:
+A bare bones Django project is provided in the _license_portal_ directory. Within the `licenses` application implement an email sending mechanism to notify the admin point of contact `licenses.Client.admin_poc` of their clients license `licenses.License` expiration times. The message must be sent to a clients admin point of contact only if the following conditions are met:
 
-1) The client has licenses which expire in exactly 4 months
-2) The client has licenses which expire within a month and today is monday
-3) The client has licenses which expire within a week
-4) All of the above
+1. The client has licenses which expire in exactly 4 months
+2. The client has licenses which expire within a month and today is monday
+3. The client has licenses which expire within a week
+4. All of the above
 
 The email body must consist of a list of all a client's licenses which meet the above conditions and emails must only include details for a single client (e.g. a separate email for each client). The expiring licenses in the email body must include:
 
@@ -41,7 +87,6 @@ _Tip:_ Use django's builtin `django.core.mail.backends.locmem.EmailBackend`
 
 _Bonus:_ Implement the `licenses` application as an API, and serve the frontend using a separate Docker image
 
-Restrictions
-============
+# Restrictions
 
 None! Use whatever tools / third party libraries you feel are necessary to complete the task.

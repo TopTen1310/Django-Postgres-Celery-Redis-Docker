@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import django
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -26,7 +30,7 @@ SECRET_KEY = '^k53s4xvwr)j@oswog!f)velbs5_%lfd-gmca9#uku@kmjmh=w'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
 
 
 # Application definition
@@ -38,12 +42,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'licenses'
+    "corsheaders",
+    'rest_framework',
+    'django_celery_beat',
+    'licenses',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -124,4 +132,40 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-DEFAULT_AUTO_FIELD="django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    # Define pagination class and page_size for pagination
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}
+
+
+# Email settings for gmail
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'machinesearch.io'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('DONOT_REPLY_EMAIL')
+DISPLAY_NAME = 'Castlabs'
+DONOT_REPLY_EMAIL_PASSWORD = os.environ.get('DONOT_REPLY_EMAIL_PASSWORD')
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+# Celery, Celery Beat and Redis settings
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER', 'redis://redis:6379')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_BACKEND', 'redis://redis:6379')
+if CELERY_RESULT_BACKEND == 'django-db':
+    INSTALLED_APPS += ['django_celery_results']
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/London'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_ALWAYS_EAGER = True

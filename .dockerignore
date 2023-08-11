@@ -1,0 +1,5 @@
+.git
+*.md
+.cache
+node_modules/
+venv/

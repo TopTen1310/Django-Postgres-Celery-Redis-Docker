@@ -1,0 +1,67 @@
+{
+  "name": "license_test_frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@heroicons/react": "^1.0.6",
+    "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/typography": "^0.5.9",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "lodash": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
+    "react-notifications": "^1.7.4",
+    "react-router-dom": "^6.14.1",
+    "react-scripts": "5.0.1",
+    "react-table": "^7.8.0",
+    "tailwind-safelist-generator": "^1.0.0",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "run-p watch:css react-scripts:start",
+    "build": "run-s build:css react-scripts:build",
+    "react-scripts:start": "react-scripts start",
+    "react-scripts:build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "build:css": "cross-env TAILWIND_MODE=build NODE_ENV=production postcss src/styles/app.css -o src/index.css",
+    "watch:css": "cross-env TAILWIND_MODE=watch NODE_ENV=development postcss src/styles/app.css -o src/index.css --watch",
+    "format": "prettier --write ."
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "cross-env": "^7.0.3",
+    "delay-cli": "^2.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "miragejs": "^0.1.47",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.25",
+    "postcss-cli": "^10.1.0",
+    "postcss-import": "^15.1.0",
+    "postcss-nested": "^6.0.1",
+    "postcss-preset-env": "^9.0.0",
+    "prettier": "^3.0.0",
+    "tailwindcss": "^3.3.2"
+  }
+}

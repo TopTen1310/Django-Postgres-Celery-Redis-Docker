@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            padding: 2rem;
+            background-color: #f7f8f9;
+        }
+
+        .content {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        td {
+            background-color: #fff;
+        }
+
+        tr:hover td {
+            background-color: #f7f8f9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <p>Dear Sales team,</p>
+        <p>Please find the expiring licenses for the client {{ client.client_name }} below:</p>
+        <table>
+            <tr>
+                <th>License id</th>
+                <th>License Type</th>
+                <th>Name of the package</th>
+                <th>Expiration date</th>
+                <th>POC info (name & email)</th>
+            </tr>
+            {% for license in expiring_licenses %}
+            <tr>
+                <td>{{ license.id }}</td>
+                <td>{{ license.get_license_type_display }}</td>
+                <td>{{ license.get_package_display }}</td>
+                <td>{{ license.expiration_datetime }}</td>
+                <td>
+                    {{ license.client.poc_contact_name }} - {{ license.client.poc_contact_email }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+
+</html>

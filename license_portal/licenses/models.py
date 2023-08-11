@@ -7,6 +7,7 @@ from typing import Tuple, List
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 LICENSE_EXPIRATION_DELTA = timedelta(days=90)
 
@@ -14,8 +15,8 @@ LICENSE_EXPIRATION_DELTA = timedelta(days=90)
 class ChoiceEnum(enum.Enum):
     """Enum for choices in a choices field"""
     @classmethod
-    def get_choices(cls) -> List[Tuple[str, int]]:
-        return [(a.name, a.value) for a in cls]
+    def get_choices(cls) -> List[Tuple[int, str]]:
+        return [(a.value, a.name) for a in cls]
 
 
 class Package(ChoiceEnum):
@@ -31,6 +32,13 @@ class LicenseType(ChoiceEnum):
     evaluation = 1
 
 
+class NotificationType(ChoiceEnum):
+    """A notification type"""
+    four_month = 0
+    one_month = 1
+    one_week = 2
+
+
 def get_default_license_expiration() -> datetime:
     """Get the default expiration datetime"""
     return datetime.utcnow() + LICENSE_EXPIRATION_DELTA
@@ -41,10 +49,12 @@ class License(models.Model):
     """
     client = models.ForeignKey('Client', on_delete=models.CASCADE)
     package = models.PositiveSmallIntegerField(choices=Package.get_choices())
-    license_type = models.PositiveSmallIntegerField(choices=LicenseType.get_choices())
+    license_type = models.PositiveSmallIntegerField(
+        choices=LicenseType.get_choices())
 
     created_datetime = models.DateTimeField(auto_now=True)
-    expiration_datetime = models.DateTimeField(default=get_default_license_expiration)
+    expiration_datetime = models.DateTimeField(
+        default=get_default_license_expiration)
 
 
 class Client(models.Model):
@@ -54,4 +64,33 @@ class Client(models.Model):
     poc_contact_name = models.CharField(max_length=120)
     poc_contact_email = models.EmailField()
 
-    admin_poc = models.ForeignKey(User, limit_choices_to={'is_staff': True}, on_delete=models.CASCADE)
+    admin_poc = models.ForeignKey(User, limit_choices_to={
+                                  'is_staff': True}, on_delete=models.CASCADE)
+
+
+class LicenseNotification(models.Model):
+    notification = models.ForeignKey("Notification", on_delete=models.CASCADE)
+    license = models.ForeignKey("License", on_delete=models.CASCADE)
+    notification_type = models.PositiveSmallIntegerField(
+        choices=NotificationType.get_choices()
+    )
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_notification_type(license: License) -> int:
+        if license.expiration_datetime - timezone.now() > timedelta(days=32):
+            notif_type = NotificationType.four_month.value
+        elif license.expiration_datetime - timezone.now() < timedelta(days=7):
+            notif_type = NotificationType.one_week.value
+        else:
+            notif_type = NotificationType.one_month.value
+        return notif_type
+
+
+class Notification(models.Model):
+    client = models.ForeignKey("Client", on_delete=models.CASCADE)
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)

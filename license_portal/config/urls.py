@@ -15,7 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.urls import include, re_path
+
+from licenses.views import email_template
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    re_path(r'^check-email-template/', email_template,
+            name='check-email-template'),
+    re_path(r"^api/", include(("api.urls", "api"), namespace="api")),
 ]
